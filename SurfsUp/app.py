@@ -1,4 +1,4 @@
-# Import the dependencies.
+# Importing the dependencies.
 from flask import Flask, jsonify
 import numpy as np
 import pandas as pd
@@ -10,21 +10,16 @@ from sqlalchemy.orm import Session
 #################################################
 # Database Setup
 #################################################
-# Create engine and reflect database
+# Create engine and reflect the database
 engine = create_engine("sqlite:///Resources/hawaii.sqlite")
 Base = automap_base()
 Base.prepare(engine, reflect=True)
-
-# reflect an existing database into a new model
-
-# reflect the tables
-
 
 # Save references to each table
 Measurement = Base.classes.measurement
 Station = Base.classes.station
 
-# Create our session (link) from Python to the DB
+# Create the session (link) from Python to the DB
 session = Session(engine)
 
 #################################################
@@ -55,7 +50,7 @@ def welcome():
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     """Return the last 12 months of precipitation data."""
-    # Find the most recent date in the dataset
+    # Finding the most recent date in the dataset
     most_recent_date = session.query(func.max(Measurement.date)).scalar()
     one_year_ago = pd.to_datetime(most_recent_date) - pd.DateOffset(years=1)
 
@@ -77,7 +72,7 @@ def stations():
     # Query all station data
     results = session.query(Station.station).all()
 
-    # Convert list of tuples into a normal list
+    # Converting a list of tuples into a normal list
     stations_list = [station[0] for station in results]
     return jsonify(stations_list)
 
@@ -85,7 +80,7 @@ def stations():
 @app.route("/api/v1.0/tobs")
 def tobs():
     """Return temperature observations (TOBS) for the previous year for the most active station."""
-    # Find the most active station
+    # Finding the most active station
     most_active_station = (
         session.query(Measurement.station, func.count(Measurement.station))
         .group_by(Measurement.station)
@@ -93,7 +88,7 @@ def tobs():
         .first()[0]
     )
 
-    # Find the most recent date and calculate one year back
+    # Finding the most recent date and calculate one year back
     most_recent_date = session.query(func.max(Measurement.date)).scalar()
     one_year_ago = pd.to_datetime(most_recent_date) - pd.DateOffset(years=1)
 
